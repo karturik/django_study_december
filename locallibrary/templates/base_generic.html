@@ -19,12 +19,16 @@
         <div class="container-fluid">
             <div class="row">
                 {% block sidebar %}
-                {% include "navbar.html" %}
+                    {% include "navbar.html" %}
                 {% endblock %}
             </div>
             <div class="row">
-                <div class="col-sm-2"></div>
-                <div class="col-sm-8">{% block content %}{% endblock %}</div>
+                <div class="col-sm-2">{{ request.path }}</div>
+                <div class="col-sm-8">{% block content %}{% endblock %}
+                {% block pagination %}
+                    {% include "pagination.html" %}
+                {% endblock %}
+                </div>
                 <div class="col-sm-2"></div>
             </div>
         </div>

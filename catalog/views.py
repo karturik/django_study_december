@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.views import generic
 from .models import Book, Author, BookInstance, Genre
     
 
@@ -17,7 +18,7 @@ def catalog_main_page(request):
     # переменной контекста context
     return render(
         request,
-        'catalog_main_page.html',
+        'catalog/catalog_main_page.html',
         context={
             'num_books': num_books,
             'num_instances': num_instances,
@@ -25,3 +26,18 @@ def catalog_main_page(request):
             'num_authors': num_authors
             }
     )
+    
+
+class BookListView(generic.ListView):
+    model = Book
+    paginate_by = 10
+
+class BookDetailView(generic.DetailView):
+    model = Book
+
+class AuthorListView(generic.ListView):
+    model = Author
+    paginate_by = 10
+
+class AuthorDetailView(generic.DetailView):
+    model = Author
