@@ -2,6 +2,7 @@
     
 {% block content %}
     <h1>Title: {{ book.title }}</h1>
+    <p><muted>you have visit this page: </muted> {{ visit_num }}</p>
 
     <p><strong>Author:</strong> <a href="">{{ book.author }}</a></p> <!-- author detail link not yet defined -->
     <p><strong>Summary:</strong> {{ book.summary }}</p>
