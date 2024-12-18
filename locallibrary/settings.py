@@ -59,7 +59,10 @@ ROOT_URLCONF = 'locallibrary.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join('locallibrary', 'templates')],
+        'DIRS': [
+            os.path.join('locallibrary', 'templates'),
+            os.path.join('users_and_accounts', 'templates')
+            ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -128,3 +131,18 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_HOST_USER = 'django_academy_shop@mail.ru'
+EMAIL_HOST_PASSWORD = config("EMAIL_PASSWORD")
+EMAIL_PORT = 2525
+# EMAIL_PORT = 465
+EMAIL_USE_TLS = True
