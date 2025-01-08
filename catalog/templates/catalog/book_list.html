@@ -3,12 +3,16 @@
 {% block content %}
     <h1>Book List</h1>
 
+    <a href="{% url 'book_create' %}"> Create New Book </a>
+
     {% if book_list %}
     <div class="container">
         <div class="row row-cols-1 row-cols-md-3 g-4">
             {% for book in book_list %}
                 <div class="col">
                     {% include "catalog/book_card.html" %}
+                    <a href="{% url 'book_update' book.id %}">Edit</a>
+                    <a href="{% url 'book_delete' book.id %}">Delete</a>
                 </div>
             {% endfor %}
         </div>

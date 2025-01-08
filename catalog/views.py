@@ -2,6 +2,8 @@ import datetime
 
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import render
@@ -148,3 +150,29 @@ class AuthorUpdate(UpdateView):
 class AuthorDelete(DeleteView):
     model = Author
     success_url = reverse_lazy('author-list')
+    delete_message = "Автор удален."
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.error(self.request, self.delete_message)
+        return response
+
+class BookCreate(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.CreateView):
+    permission_required = 'catalog.can_mark_returned'
+    model = Book
+    fields = '__all__'
+    success_url = reverse_lazy('book-list')
+    success_message = "Книга успешно создана."
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, self.success_message)
+        return response
+
+class BookUpdate(UpdateView):
+    model = Book
+    fields = '__all__'
+
+class BookDelete(DeleteView):
+    model = Book
+    success_url = reverse_lazy('book-list')
