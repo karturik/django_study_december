@@ -21,6 +21,9 @@ class RenewBookForm(forms.Form):
         # Помните, что всегда надо возвращать "очищенные" данные.
         return data
 
+class UploadBooksFileForm(forms.Form):
+    file = forms.FileField()
+
 # from django.forms import ModelForm
 # from .models import BookInstance
 

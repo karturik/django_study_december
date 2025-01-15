@@ -1,4 +1,5 @@
 import datetime
+import pandas as pd
 
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -9,11 +10,12 @@ from django.urls import reverse_lazy, reverse
 from django.shortcuts import render
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.sessions.backends.db import SessionStore
 
-from .forms import RenewBookForm
-from .models import Book, Author, BookInstance, Genre
+from .forms import RenewBookForm, UploadBooksFileForm
+from .models import Book, Author, BookInstance, Genre, Language
+from .utils import create_books_from_df
 
 def catalog_main_page(request):
     """
@@ -176,3 +178,32 @@ class BookUpdate(UpdateView):
 class BookDelete(DeleteView):
     model = Book
     success_url = reverse_lazy('book-list')
+
+
+def book_file_upload_view(request):
+    if request.method == 'POST':
+        if 'file' not in request.FILES:
+            return HttpResponse('No file uploaded')
+        
+        file = request.FILES['file']
+        file_format = file.name.split('.')[-1].lower()
+        
+        if file_format == 'csv':
+            try:
+                df = pd.read_csv(file)
+            except Exception as e:
+                return HttpResponse(f'Error reading CSV file: {e}')
+        elif file_format in ['xls', 'xlsx']:
+            try:
+                df = pd.read_excel(file)
+            except Exception as e:
+                return HttpResponse(f'Error reading Excel file: {e}')
+        else:
+            return HttpResponse('Unsupported file format')
+
+        create_books_from_df(df)
+        
+        return HttpResponse(df.to_html())
+    else:
+        form = UploadBooksFileForm()
+        return render(request, 'catalog/book_file_upload.html', context={'form': form})
