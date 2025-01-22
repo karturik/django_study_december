@@ -1,0 +1,7 @@
+.venv/
+**/__pycache__/
+**/migrations/
+**/.git/
+db.sqlite3
+all_books.csv
+media/

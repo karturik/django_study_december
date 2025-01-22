@@ -10,7 +10,7 @@ from django.urls import reverse_lazy, reverse
 from django.shortcuts import render
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.contrib.sessions.backends.db import SessionStore
 
 from .forms import RenewBookForm, UploadBooksFileForm
@@ -68,6 +68,12 @@ class BookDetailView(generic.DetailView):
         visit_num = session.get(visit_key, 0)
         session[visit_key] = visit_num + 1
         session.save()
+
+        # Add user_profile to context
+        if self.request.user.is_authenticated:
+            context['user_profile'] = self.request.user.profile
+        else:
+            context['user_profile'] = None
 
         # Добавить новый элемент к контексту
         context['visit_num'] = visit_num
@@ -207,3 +213,32 @@ def book_file_upload_view(request):
     else:
         form = UploadBooksFileForm()
         return render(request, 'catalog/book_file_upload.html', context={'form': form})
+
+def searching(request):
+    print(request)
+    if request.method == "POST":
+        searched = request.POST.get('searched').title()
+        print("User search query: ", searched)
+        books_results = Book.objects.filter(title__icontains=searched)
+        authors_results = Author.objects.filter(last_name__icontains=searched)
+        print(books_results, authors_results)
+        return render(request, "catalog/search_page.html", {'searched':searched, 
+                                                            'books_results':books_results,
+                                                            'authors_results':authors_results})
+    else:
+        return render(request, "catalog/search_page.html")
+    
+def like_book(request):
+    if request.method == "POST":
+        book_id = request.POST.get('book_id')
+        book = Book.objects.get(pk=book_id)
+        user_profile = request.user.profile  # предполагается, что у пользователя есть профиль
+
+        if user_profile.liked_books.filter(id=book_id).exists():
+            user_profile.liked_books.remove(book)
+            status = 'unliked'
+        else:
+            user_profile.liked_books.add(book)
+            status = 'liked'
+
+        return JsonResponse({'status': status})

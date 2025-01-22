@@ -21,6 +21,11 @@ urlpatterns = [
     re_path(r'^book/(?P<pk>\d+)/update/$', views.BookUpdate.as_view(), name='book_update'),
     re_path(r'^book/(?P<pk>\d+)/delete/$', views.BookDelete.as_view(), name='book_delete'),
 
-    re_path(r'^book/upload/$', views.book_file_upload_view, name='upload_book')
+    re_path(r'^book/upload/$', views.book_file_upload_view, name='upload_book'),
+
+    re_path("^search/$", views.searching, name="searching"),
+
+    path('like_book/', views.like_book, name='like_book'),
+
 
 ]

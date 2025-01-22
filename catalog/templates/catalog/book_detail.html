@@ -10,6 +10,13 @@
     <p><strong>Language:</strong> {{ book.language }}</p>
     <p><strong>Genre:</strong> {% for genre in book.genre.all %} {{ genre }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
 
+    {% if user_profile %}
+      <button id="like-btn" data-book-id="{{ book.id }}" {% if book in user_profile.liked_books.all %}class="liked"{% endif %}>
+          {% if book in user_profile.liked_books.all %}Unlike{% else %}Like{% endif %}
+      </button>
+    {% endif %}
+
+    
     <div style="margin-left:20px;margin-top:20px">
         <h4>Copies</h4>
 
@@ -22,4 +29,33 @@
         {% endfor %}
     </div>
 
+{% endblock %}
+
+{% block javascript %}
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $("#like-btn").click(function() {
+        var bookId = $(this).data('book-id');
+        $.ajax({
+          type: "POST",
+          url: "{% url 'like_book' %}",
+          data: {
+            'book_id': bookId,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+          },
+          success: function(response) {
+            if (response.status === 'liked') {
+              $("#like-btn").addClass('liked').text('Unlike');
+            } else {
+              $("#like-btn").removeClass('liked').text('Like');
+            }
+          },
+          error: function(response) {
+            console.log(response);
+          }
+        });
+      });
+    });
+  </script>
 {% endblock %}
